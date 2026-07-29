@@ -1,10 +1,22 @@
-import AppTabs from '@/components/app-tabs';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+
 import { AppProviders } from '@/providers/AppProviders';
 
-export default function TabLayout() {
+/**
+ * Application entry layout for Expo Router.
+ * AppProviders wraps navigation so every route receives global app context.
+ */
+export default function RootLayout() {
   return (
     <AppProviders>
-      <AppTabs />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: 'fade',
+        }}
+      />
+      <StatusBar style="auto" />
     </AppProviders>
   );
 }
