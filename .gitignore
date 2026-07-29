@@ -9,6 +9,10 @@ dist/
 web-build/
 expo-env.d.ts
 
+# Environment variables
+.env
+.env*.local
+
 # Native
 .kotlin/
 *.orig.*
@@ -21,23 +25,24 @@ expo-env.d.ts
 # Metro
 .metro-health-check*
 
-# debug
+# Debug
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+*.log
 
 # macOS
 .DS_Store
 *.pem
 
-# local env files
-.env*.local
-
-# typescript
+# TypeScript
 *.tsbuildinfo
 
-example
-
-# generated native folders
+# Generated native folders
 /ios
 /android
+
+# VS Code
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
