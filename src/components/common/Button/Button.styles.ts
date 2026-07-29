@@ -8,7 +8,6 @@ import type { ButtonSize, ButtonVariant } from './Button.types';
 type ButtonState = {
   disabled: boolean;
   fullWidth: boolean;
-  pressed: boolean;
 };
 
 const sizeStyles = (theme: AegisTheme, size: ButtonSize) => {
@@ -97,7 +96,7 @@ export function getButtonIndicatorColor(
   return theme.colors.primary;
 }
 
-/** Creates theme-aware styles for the Button primitive. */
+/** Creates theme-aware styles for each button variant, size, and interaction state. */
 export function createButtonStyles(
   theme: AegisTheme,
   variant: ButtonVariant,
@@ -113,9 +112,12 @@ export function createButtonStyles(
       justifyContent: 'center',
       borderWidth: 1,
       borderRadius: theme.radius.button,
-      opacity: state.disabled ? 0.56 : state.pressed ? 0.82 : 1,
+      opacity: state.disabled ? 0.56 : 1,
       ...sizeStyles(theme, size),
       ...variantStyles(theme, variant),
+    },
+    pressedRoot: {
+      opacity: state.disabled ? 0.56 : 0.82,
     },
     disabled: {
       backgroundColor: variant === 'ghost' ? theme.colors.transparent : theme.colors.overlay,
@@ -127,6 +129,12 @@ export function createButtonStyles(
     icon: {
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    hiddenContent: {
+      opacity: 0,
+    },
+    loadingIndicator: {
+      position: 'absolute',
     },
   });
 }

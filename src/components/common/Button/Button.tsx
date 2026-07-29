@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 
 import { Text } from '@/components/common/Text';
+import type { TextVariant } from '@/components/common/Text';
 import { useTheme } from '@/theme/useTheme';
 
 import {
@@ -11,13 +12,23 @@ import {
 } from './Button.styles';
 import type { ButtonProps } from './Button.types';
 
-/** Reusable themed Pressable button with variants, sizes, icons, and loading state. */
-export function Button({
+const textVariantsBySize = {
+  small: 'body',
+  medium: 'title',
+  large: 'heading3',
+} satisfies Record<NonNullable<ButtonProps['size']>, TextVariant>;
+
+/** Memoized button implementation preserving variant behavior, loading layout, and theme styles. */
+function ButtonComponent({
+  accessibilityHint,
+  accessibilityLabel,
+  accessibilityState,
   children,
   disabled = false,
   fullWidth = false,
   leftIcon,
   loading = false,
+  onPress,
   rightIcon,
   size = 'medium',
   style,
@@ -27,50 +38,91 @@ export function Button({
 }: ButtonProps) {
   const { theme } = useTheme();
   const isDisabled = disabled || loading;
-  const textColor = getButtonTextColor(variant, isDisabled);
-  const indicatorColor = getButtonIndicatorColor(theme, variant, isDisabled);
-  const defaultStyles = useMemo(
+  const textVariant = useMemo(() => textVariantsBySize[size], [size]);
+  const textColor = useMemo(() => getButtonTextColor(variant, isDisabled), [isDisabled, variant]);
+  const indicatorColor = useMemo(
+    () => getButtonIndicatorColor(theme, variant, isDisabled),
+    [isDisabled, theme, variant],
+  );
+  const buttonAccessibilityLabel = useMemo(
+    () => accessibilityLabel ?? (typeof children === 'string' ? children : undefined),
+    [accessibilityLabel, children],
+  );
+  const buttonAccessibilityState = useMemo(
+    () => ({
+      ...accessibilityState,
+      disabled: isDisabled,
+      busy: loading,
+    }),
+    [accessibilityState, isDisabled, loading],
+  );
+  const styles = useMemo(
     () =>
       createButtonStyles(theme, variant, size, {
         disabled: isDisabled,
         fullWidth,
-        pressed: false,
       }),
     [fullWidth, isDisabled, size, theme, variant],
   );
-  const pressedStyles = useMemo(
-    () =>
-      createButtonStyles(theme, variant, size, {
-        disabled: isDisabled,
-        fullWidth,
-        pressed: true,
-      }),
-    [fullWidth, isDisabled, size, theme, variant],
+  const handlePress = useCallback<NonNullable<ButtonProps['onPress']>>(
+    (event) => {
+      if (isDisabled) {
+        return;
+      }
+
+      onPress?.(event);
+    },
+    [isDisabled, onPress],
+  );
+  const pressableStyle = useCallback(
+    ({ pressed }: { pressed: boolean }) => {
+      return [
+        styles.root,
+        pressed && styles.pressedRoot,
+        isDisabled && styles.disabled,
+        style,
+      ];
+    },
+    [isDisabled, style, styles],
+  );
+  const leadingContent = loading ? (
+    <>
+      {leftIcon ? <View style={styles.hiddenContent}>{leftIcon}</View> : null}
+      <ActivityIndicator
+        color={indicatorColor}
+        size="small"
+        style={leftIcon ? styles.loadingIndicator : undefined}
+      />
+    </>
+  ) : (
+    leftIcon
+  );
+  const trailingContent = loading && rightIcon ? (
+    <View style={styles.hiddenContent}>{rightIcon}</View>
+  ) : (
+    rightIcon
   );
 
   return (
     <Pressable
       {...pressableProps}
+      accessibilityHint={accessibilityHint}
+      accessibilityLabel={buttonAccessibilityLabel}
       accessibilityRole="button"
-      accessibilityState={{ disabled: isDisabled, busy: loading }}
+      accessibilityState={buttonAccessibilityState}
       disabled={isDisabled}
-      style={({ pressed }) => {
-        const styles = pressed ? pressedStyles : defaultStyles;
-
-        return [styles.root, isDisabled && styles.disabled, style];
-      }}
+      onPress={handlePress}
+      style={pressableStyle}
     >
-      {loading ? (
-        <ActivityIndicator color={indicatorColor} size="small" />
-      ) : (
-        leftIcon && <View style={defaultStyles.icon}>{leftIcon}</View>
-      )}
-      <Text color={textColor} numberOfLines={1} style={textStyle} variant="title">
+      {leadingContent ? <View style={styles.icon}>{leadingContent}</View> : null}
+      <Text color={textColor} numberOfLines={1} style={textStyle} variant={textVariant}>
         {children}
       </Text>
-      {!loading && rightIcon ? (
-        <View style={defaultStyles.icon}>{rightIcon}</View>
-      ) : null}
+      {trailingContent ? <View style={styles.icon}>{trailingContent}</View> : null}
     </Pressable>
   );
 }
+
+export const Button = memo(ButtonComponent);
+
+Button.displayName = 'Button';
