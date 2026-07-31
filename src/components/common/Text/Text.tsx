@@ -15,7 +15,7 @@ const MAX_FONT_SIZE_MULTIPLIER = 1.3;
 /** Reusable themed wrapper around React Native's Text component. */
 export function Text({
   align,
-  color,
+  color = 'text.primary',
   style,
   variant = 'body',
   ...textProps

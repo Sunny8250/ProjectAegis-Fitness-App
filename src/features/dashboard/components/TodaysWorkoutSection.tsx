@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useRef, useState, useEffect } from "react";
-import { View, StyleSheet, Pressable, Animated, Easing } from "react-native";
+import { View, StyleSheet, Pressable, Animated, Easing, ScrollView } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -130,21 +130,21 @@ export const TodaysWorkoutSection = memo(function TodaysWorkoutSection({ isLoadi
                 <View style={[styles.difficultyBadge, { backgroundColor: hexAlpha(difficultyColor, 0.9) }]}>
                   <Text variant="small" style={styles.difficultyText}>{workout.difficulty}</Text>
                 </View>
-                <View style={styles.heroMetrics}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.heroMetrics}>
                   <View style={styles.heroMetricBadge}>
-                    <Text variant="caption" style={styles.heroMetricText}>{workout.duration}</Text>
+                    <Text variant="caption" style={styles.heroMetricText}>⏱️ {workout.duration}</Text>
                   </View>
                   <View style={styles.heroMetricBadge}>
-                    <Text variant="caption" style={styles.heroMetricText}>{workout.calories}</Text>
+                    <Text variant="caption" style={styles.heroMetricText}>🔥 {workout.calories}</Text>
                   </View>
                   <View style={styles.heroMetricBadge}>
-                    <Text variant="caption" style={styles.heroMetricText}>{workout.exercises}</Text>
+                    <Text variant="caption" style={styles.heroMetricText}>💪 {workout.exercises}</Text>
                   </View>
                   <View style={styles.heroMetricBadge}>
                     <MaterialCommunityIcons name="star" size={12} color="#FBBF24" />
                     <Text variant="caption" style={styles.heroMetricText}> {workout.rating}</Text>
                   </View>
-                </View>
+                </ScrollView>
               </View>
             </View>
 
@@ -273,7 +273,6 @@ function createStyles(theme: AegisTheme) {
     },
     heroMetrics: {
       flexDirection: 'row',
-      flexWrap: 'wrap',
       gap: 8,
     },
     heroMetricBadge: {
@@ -303,12 +302,17 @@ function createStyles(theme: AegisTheme) {
       lineHeight: 20,
     },
     aiInsightPanel: {
-      backgroundColor: hexAlpha(theme.colors.primary, 0.06),
+      backgroundColor: hexAlpha(theme.colors.primary, 0.08),
       borderRadius: theme.radius.xl,
       padding: theme.spacing.md,
       marginBottom: theme.spacing.xl,
       borderWidth: 1,
-      borderColor: hexAlpha(theme.colors.primary, 0.15),
+      borderColor: hexAlpha(theme.colors.primary, 0.2),
+      shadowColor: theme.colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 12,
+      elevation: 3,
     },
     aiInsightHeader: {
       flexDirection: 'row',

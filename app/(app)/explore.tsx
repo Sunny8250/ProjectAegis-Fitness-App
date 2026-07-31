@@ -134,8 +134,8 @@ export default function ExploreScreen() {
               </View>
             </View>
             <View style={styles.featuredActions}>
-              <Button variant="primary" style={{ flex: 1 }}>Start Workout</Button>
-              <Button variant="outline" style={{ flex: 1 }}>View Details</Button>
+              <Button variant="primary" fullWidth>Start Workout</Button>
+              <Button variant="outline" fullWidth>View Details</Button>
             </View>
           </Card>
         </View>
@@ -169,14 +169,14 @@ export default function ExploreScreen() {
           <Text variant="title" style={styles.sectionTitle}>Recommended Categories</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalScroll}>
             {RECOMMENDED_CATEGORIES.map(category => (
-              <Card key={category.id} padding="none" style={styles.categoryCard}>
+              <Pressable key={category.id} style={styles.categoryCard}>
                 <Image source={{ uri: category.imageUri }} style={StyleSheet.absoluteFill} contentFit="cover" />
                 <LinearGradient colors={['transparent', 'rgba(0,0,0,0.6)', 'rgba(0,0,0,0.95)']} style={StyleSheet.absoluteFill} />
                 <View style={styles.categoryContent}>
                   <Text variant="title" style={{ color: '#FFF' }}>{category.title}</Text>
                   <Text variant="small" style={{ color: '#DDD' }}>{category.count} workouts</Text>
                 </View>
-              </Card>
+              </Pressable>
             ))}
           </ScrollView>
         </View>
@@ -189,7 +189,7 @@ export default function ExploreScreen() {
               <Card key={workout.id} padding="none" style={styles.workoutCard}>
                 <Image source={{ uri: workout.imageUri }} style={styles.workoutImage} contentFit="cover" />
                 <View style={styles.workoutContent}>
-                  <Text variant="body" style={styles.workoutTitle} numberOfLines={1}>{workout.title}</Text>
+                  <Text variant="body" style={styles.workoutTitle} numberOfLines={2}>{workout.title}</Text>
                   <Text variant="caption" color="text.secondary">
                     {workout.duration} • {workout.difficulty}
                   </Text>
@@ -204,8 +204,8 @@ export default function ExploreScreen() {
           <Text variant="title" style={styles.sectionTitle}>Workout Programs</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalScroll}>
             {WORKOUT_PROGRAMS.map(program => (
-              <Card key={program.id} padding="none" style={styles.programCard}>
-                <Image source={{ uri: program.imageUri }} style={styles.programImage} contentFit="cover" />
+              <Pressable key={program.id} style={styles.programCard}>
+                <Image source={{ uri: program.imageUri }} style={StyleSheet.absoluteFill} contentFit="cover" />
                 <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={StyleSheet.absoluteFill} />
                 <View style={styles.programContent}>
                   <Text variant="title" style={{ color: '#FFF', marginBottom: 4 }}>{program.title}</Text>
@@ -218,7 +218,7 @@ export default function ExploreScreen() {
                     </View>
                   </View>
                 </View>
-              </Card>
+              </Pressable>
             ))}
           </ScrollView>
         </View>
@@ -231,7 +231,7 @@ export default function ExploreScreen() {
               <Card key={workout.id} padding="none" style={styles.workoutCard}>
                 <Image source={{ uri: workout.imageUri }} style={styles.workoutImage} contentFit="cover" />
                 <View style={styles.workoutContent}>
-                  <Text variant="body" style={styles.workoutTitle} numberOfLines={1}>{workout.title}</Text>
+                  <Text variant="body" style={styles.workoutTitle} numberOfLines={2}>{workout.title}</Text>
                   <Text variant="caption" color="text.secondary">
                     {workout.duration} • {workout.difficulty}
                   </Text>
@@ -265,7 +265,7 @@ function createStyles(theme: AegisTheme) {
       backgroundColor: theme.colors.background,
     },
     scrollContent: {
-      paddingBottom: theme.spacing.xl,
+      paddingBottom: 100, // Ensure it clears the bottom tab bar
     },
     header: {
       paddingHorizontal: theme.spacing.lg,
@@ -387,18 +387,22 @@ function createStyles(theme: AegisTheme) {
       fontWeight: '600',
     },
     featuredActions: {
-      flexDirection: 'row',
       gap: 12,
       padding: theme.spacing.md,
       backgroundColor: theme.colors.surface,
     },
     activeWorkoutCard: {
       marginHorizontal: theme.spacing.lg,
-      backgroundColor: hexAlpha(theme.colors.primary, 0.05),
+      backgroundColor: hexAlpha(theme.colors.primary, 0.08),
       borderWidth: 1,
-      borderColor: hexAlpha(theme.colors.primary, 0.2),
+      borderColor: hexAlpha(theme.colors.primary, 0.3),
       borderRadius: theme.radius.xl,
       padding: theme.spacing.md,
+      shadowColor: theme.colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 4,
     },
     activeHeader: {
       flexDirection: 'row',
@@ -415,9 +419,9 @@ function createStyles(theme: AegisTheme) {
       justifyContent: 'center',
     },
     progressBarBg: {
-      height: 4, // Thinner progress bar
+      height: 6, // Slightly thicker progress bar
       backgroundColor: hexAlpha(theme.colors.border, 0.5),
-      borderRadius: 2,
+      borderRadius: 3,
       overflow: 'hidden',
     },
     progressBarFill: {

@@ -23,6 +23,12 @@ export function BottomTabBar({ state, descriptors, navigation }: any) {
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
+  const currentRoute = state.routes[state.index];
+  const currentOptions = descriptors[currentRoute.key].options;
+  if (currentOptions?.tabBarStyle?.display === "none") {
+    return null;
+  }
+
   return (
     <View style={styles.containerWrap}>
       <View style={styles.tabBar}>
