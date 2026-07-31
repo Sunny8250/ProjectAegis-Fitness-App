@@ -7,13 +7,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { formatElapsedTime } from '@/utils/time';
-import Svg, { Circle } from 'react-native-svg';
+import { hexAlpha } from '@/utils/colors';
 
 interface ActiveWorkoutHeaderProps {
   workoutName: string;
   currentExerciseIndex: number;
   totalExercises: number;
   elapsedTime: number;
+  estimatedTotalSeconds?: number;
   caloriesBurned?: number;
   heartRate?: number;
 }
@@ -23,6 +24,7 @@ export const ActiveWorkoutHeader = ({
   currentExerciseIndex,
   totalExercises,
   elapsedTime,
+  estimatedTotalSeconds = 2700, // default 45 min
   caloriesBurned = 0,
   heartRate = 120,
 }: ActiveWorkoutHeaderProps) => {
@@ -31,69 +33,51 @@ export const ActiveWorkoutHeader = ({
   const styles = createStyles(theme, insets);
 
   const progress = totalExercises > 0 ? (currentExerciseIndex + 1) / totalExercises : 0;
-  
-  // Progress Ring logic
-  const size = 44;
-  const strokeWidth = 4;
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const strokeDashoffset = circumference - progress * circumference;
+  const remainingTime = Math.max(0, estimatedTotalSeconds - elapsedTime);
 
   return (
     <LinearGradient
-      colors={['rgba(0,0,0,0.8)', 'transparent']}
+      colors={['rgba(0,0,0,0.9)', 'rgba(0,0,0,0.5)', 'transparent']}
+      locations={[0, 0.7, 1]}
       style={styles.container}
       pointerEvents="box-none"
     >
       <View style={styles.topRow}>
-        <View style={styles.progressContainer}>
-          <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-            <Circle
-              cx={size / 2}
-              cy={size / 2}
-              r={radius}
-              stroke="rgba(255,255,255,0.25)"
-              strokeWidth={strokeWidth}
-              fill="transparent"
-            />
-            <Circle
-              cx={size / 2}
-              cy={size / 2}
-              r={radius}
-              stroke={theme.colors.primary}
-              strokeWidth={strokeWidth}
-              strokeDasharray={circumference}
-              strokeDashoffset={strokeDashoffset}
-              fill="transparent"
-              strokeLinecap="round"
-              transform={`rotate(-90 ${size / 2} ${size / 2})`}
-            />
-          </Svg>
-          <View style={styles.progressTextContainer}>
-            <Text variant="caption" style={styles.progressText}>
-              {currentExerciseIndex + 1}/{totalExercises}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.titleContainer}>
-          <Text variant="small" style={styles.subtitle} numberOfLines={1}>
+        <View style={styles.leftContent}>
+          <Text variant="heading3" style={styles.title} numberOfLines={1}>
             {workoutName}
           </Text>
-          <Text variant="title" style={styles.timeText}>
-            {formatElapsedTime(elapsedTime)}
+          <Text variant="caption" style={styles.subtitle}>
+            Exercise {currentExerciseIndex + 1} / {totalExercises}
           </Text>
         </View>
 
         <View style={styles.rightMetrics}>
-          <View style={styles.metricItem}>
-            <MaterialCommunityIcons name="heart-pulse" size={14} color={theme.colors.error} />
-            <Text variant="caption" style={styles.metricText}>{heartRate}</Text>
-          </View>
-          <View style={styles.metricItem}>
+          <View style={styles.metricBadge}>
             <MaterialCommunityIcons name="fire" size={14} color={theme.colors.warning} />
-            <Text variant="caption" style={styles.metricText}>{caloriesBurned}</Text>
+            <Text variant="caption" style={styles.metricText}>{caloriesBurned} kcal</Text>
           </View>
+          {heartRate > 0 && (
+            <View style={styles.metricBadge}>
+              <MaterialCommunityIcons name="heart-pulse" size={14} color={theme.colors.error} />
+              <Text variant="caption" style={styles.metricText}>{heartRate}</Text>
+            </View>
+          )}
+        </View>
+      </View>
+
+      <View style={styles.bottomRow}>
+        <View style={styles.timeBlock}>
+          <Text variant="heading2" style={styles.timeValue}>{formatElapsedTime(elapsedTime)}</Text>
+          <Text variant="caption" style={styles.timeLabel}>elapsed</Text>
+        </View>
+        <View style={styles.timeBlock}>
+          <Text variant="heading2" style={[styles.timeValue, styles.dimmedText]}>{formatElapsedTime(remainingTime)}</Text>
+          <Text variant="caption" style={styles.timeLabel}>remaining</Text>
+        </View>
+        <View style={styles.progressBlock}>
+          <Text variant="heading2" style={styles.progressValue}>{Math.round(progress * 100)}%</Text>
+          <Text variant="caption" style={styles.timeLabel}>progress</Text>
         </View>
       </View>
     </LinearGradient>
@@ -114,57 +98,74 @@ function createStyles(theme: AegisTheme, insets: any) {
     },
     topRow: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       justifyContent: 'space-between',
+      marginBottom: theme.spacing.md,
     },
-    progressContainer: {
-      position: 'relative',
-      width: 44,
-      height: 44,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    progressTextContainer: {
-      position: 'absolute',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    progressText: {
-      fontWeight: '700',
-      fontSize: 10,
-      color: '#FFFFFF',
-    },
-    titleContainer: {
+    leftContent: {
       flex: 1,
-      alignItems: 'center',
-      paddingHorizontal: theme.spacing.md,
+      paddingRight: theme.spacing.md,
+    },
+    title: {
+      color: '#FFFFFF',
+      marginBottom: 2,
     },
     subtitle: {
       color: 'rgba(255,255,255,0.7)',
       textTransform: 'uppercase',
       letterSpacing: 1,
-      marginBottom: 2,
-      fontSize: 10,
-    },
-    timeText: {
-      fontWeight: '800',
-      fontVariant: ['tabular-nums'],
-      color: '#FFFFFF',
-      fontSize: 22,
+      fontSize: 11,
+      fontWeight: '600',
     },
     rightMetrics: {
       alignItems: 'flex-end',
-      gap: 4,
+      gap: 6,
     },
-    metricItem: {
+    metricBadge: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 4,
+      backgroundColor: hexAlpha(theme.colors.surface, 0.2),
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: theme.radius.sm,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.1)',
     },
     metricText: {
-      color: 'rgba(255,255,255,0.85)',
-      fontWeight: '600',
+      color: 'rgba(255,255,255,0.9)',
+      fontWeight: '700',
       fontVariant: ['tabular-nums'],
+    },
+    bottomRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.xl,
+    },
+    timeBlock: {
+      alignItems: 'flex-start',
+    },
+    progressBlock: {
+      alignItems: 'flex-start',
+      marginLeft: 'auto',
+    },
+    timeValue: {
+      color: '#FFFFFF',
+      fontVariant: ['tabular-nums'],
+    },
+    dimmedText: {
+      color: 'rgba(255,255,255,0.6)',
+    },
+    progressValue: {
+      color: theme.colors.primary,
+      fontVariant: ['tabular-nums'],
+    },
+    timeLabel: {
+      color: 'rgba(255,255,255,0.5)',
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+      fontSize: 10,
+      marginTop: -2,
     },
   });
 }

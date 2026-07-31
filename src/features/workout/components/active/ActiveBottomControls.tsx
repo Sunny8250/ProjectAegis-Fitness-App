@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, StyleSheet, Platform, TouchableOpacity } from 'react-native';
-import { Text } from '@/components/common/Text';
 import { useTheme } from '@/theme/useTheme';
 import type { AegisTheme } from '@/theme/themes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,7 +8,6 @@ import { Button } from '@/components/common/Button';
 import { LinearGradient } from 'expo-linear-gradient';
 
 interface ActiveBottomControlsProps {
-  isResting: boolean;
   isPaused: boolean;
   onPrev: () => void;
   onNext: () => void;
@@ -21,7 +19,6 @@ interface ActiveBottomControlsProps {
 }
 
 export const ActiveBottomControls = ({
-  isResting,
   isPaused,
   onPrev,
   onNext,
@@ -58,33 +55,21 @@ export const ActiveBottomControls = ({
         </TouchableOpacity>
 
         <View style={styles.mainActionContainer}>
-          {!isResting ? (
-            <Button
-              variant="primary"
-              size="large"
-              onPress={isWorkoutEnd ? onFinishWorkout : onCompleteSet}
-              style={styles.mainButton}
-              leftIcon={
-                <MaterialCommunityIcons 
-                  name={isWorkoutEnd ? "check-all" : "check"} 
-                  size={24} 
-                  color="#FFF" 
-                />
-              }
-            >
-              {isWorkoutEnd ? "Finish Workout" : "Complete Set"}
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              size="large"
-              onPress={isWorkoutEnd ? onFinishWorkout : onCompleteSet}
-              style={[styles.mainButton, styles.restButton]}
-              disabled={true} // Disabled while resting if we want to force wait, or maybe just hidden
-            >
-              Resting...
-            </Button>
-          )}
+          <Button
+            variant="primary"
+            size="large"
+            onPress={isWorkoutEnd ? onFinishWorkout : onCompleteSet}
+            style={styles.mainButton}
+            leftIcon={
+              <MaterialCommunityIcons
+                name={isWorkoutEnd ? "check-all" : "check"}
+                size={24}
+                color="#FFF"
+              />
+            }
+          >
+            {isWorkoutEnd ? "Finish Workout" : "Complete Set"}
+          </Button>
         </View>
 
         <TouchableOpacity style={styles.iconButton} onPress={onNext}>
@@ -133,11 +118,6 @@ function createStyles(theme: AegisTheme, insets: any) {
       shadowOpacity: 0.3,
       shadowRadius: 12,
       elevation: 6,
-    },
-    restButton: {
-      opacity: 0.5,
-      shadowOpacity: 0,
-      elevation: 0,
     },
   });
 }

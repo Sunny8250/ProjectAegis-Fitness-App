@@ -1,21 +1,29 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, ScrollView, StatusBar, Platform } from 'react-native';
+import { useEffect } from 'react';
+import { View, StyleSheet, ScrollView, StatusBar } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTheme } from '@/theme/useTheme';
 import type { AegisTheme } from '@/theme/themes';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-context';
 
 import { useActiveWorkout } from '@/features/workout/hooks/useActiveWorkout';
+import { useWorkoutExitGuard } from '@/features/workout/hooks/useWorkoutExitGuard';
 import { ActiveWorkoutHeader } from '@/features/workout/components/active/ActiveWorkoutHeader';
 import { ActiveExerciseShowcase } from '@/features/workout/components/active/ActiveExerciseShowcase';
 import { ActiveAiCoach } from '@/features/workout/components/active/ActiveAiCoach';
 import { ActiveSetTracker } from '@/features/workout/components/active/ActiveSetTracker';
-import { ActiveRestTimer } from '@/features/workout/components/active/ActiveRestTimer';
 import { ActiveWorkoutTimeline } from '@/features/workout/components/active/ActiveWorkoutTimeline';
 import { ActiveBottomControls } from '@/features/workout/components/active/ActiveBottomControls';
 import { ActiveExerciseInstructions } from '@/features/workout/components/active/ActiveExerciseInstructions';
+import { ActiveNextExercisePreview } from '@/features/workout/components/active/ActiveNextExercisePreview';
+import { ActiveWorkoutIntelligence } from '@/features/workout/components/active/ActiveWorkoutIntelligence';
+import { ActivePersonalRecord } from '@/features/workout/components/active/ActivePersonalRecord';
+import { RestScreen } from '@/features/workout/components/rest/RestScreen';
 
-import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated';
+
+/** Scroll clearance for the floating bottom controls, in dp. */
+const BOTTOM_CONTROLS_CLEARANCE = 100;
+const MIN_BOTTOM_INSET = 40;
 
 export default function ActiveWorkoutScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -31,12 +39,17 @@ export default function ActiveWorkoutScreen() {
     currentSetIndex,
     currentExercise,
     currentSet,
-    upcomingExercise,
-    isResting,
-    restTimeRemaining,
     elapsedTime,
+    caloriesBurned,
     isFinished,
     isPaused,
+    isResting,
+    restTimer,
+    restPlan,
+    restCoach,
+    recovery,
+    nextUp,
+    sessionProgress,
     completeSet,
     updateSet,
     skipRest,
@@ -45,7 +58,14 @@ export default function ActiveWorkoutScreen() {
     prevExercise,
     finishWorkout,
     togglePause,
+    workoutIntelligence,
+    isPR,
   } = useActiveWorkout(id as string);
+
+  useWorkoutExitGuard({
+    enabled: !isFinished,
+    onConfirmExit: () => router.back(),
+  });
 
   useEffect(() => {
     if (isFinished) {
@@ -60,6 +80,7 @@ export default function ActiveWorkoutScreen() {
 
   const isLastExercise = currentExerciseIndex === exercises.length - 1;
   const isLastSet = currentSetIndex === currentExercise.sets.length - 1;
+  const isRestVisible = isResting && restPlan !== null;
 
   return (
     <View style={styles.container}>
@@ -70,27 +91,36 @@ export default function ActiveWorkoutScreen() {
         currentExerciseIndex={currentExerciseIndex}
         totalExercises={exercises.length}
         elapsedTime={elapsedTime}
-        caloriesBurned={Math.floor(elapsedTime / 10)} // Mock calculation
+        caloriesBurned={caloriesBurned}
         heartRate={120 + (isResting ? -15 : 10)} // Mock fluctuation
       />
 
-      <ScrollView 
+      <ActivePersonalRecord isPR={isPR} />
+
+      <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={
+          isRestVisible ? styles.restScrollContent : styles.scrollContent
+        }
         showsVerticalScrollIndicator={false}
       >
-        {isResting ? (
+        {isRestVisible && restPlan ? (
           <Animated.View
             key="rest-view"
             entering={FadeIn.duration(400)}
             exiting={FadeOut.duration(300)}
-            layout={Layout.springify()}
+            layout={LinearTransition.springify()}
           >
-            <ActiveRestTimer
-              restTimeRemaining={restTimeRemaining}
-              upcomingExercise={upcomingExercise}
-              onSkip={skipRest}
+            <RestScreen
+              coach={restCoach}
+              nextUp={nextUp}
               onAdjust={adjustRest}
+              onSkip={skipRest}
+              onTogglePause={togglePause}
+              plan={restPlan}
+              progress={sessionProgress}
+              recovery={recovery}
+              timer={restTimer}
             />
           </Animated.View>
         ) : (
@@ -98,15 +128,19 @@ export default function ActiveWorkoutScreen() {
             key="exercise-view"
             entering={FadeIn.duration(400)}
             exiting={FadeOut.duration(300)}
-            layout={Layout.springify()}
+            layout={LinearTransition.springify()}
             style={styles.exerciseViewContainer}
           >
-            <ActiveExerciseShowcase exercise={currentExercise} />
+            <ActiveExerciseShowcase exercise={currentExercise} currentSetIndex={currentSetIndex} />
             <View style={styles.exerciseContent}>
-              <ActiveAiCoach tip={currentExercise.aiTip} />
-              
+              <ActiveAiCoach 
+                exercise={currentExercise} 
+                currentSetIndex={currentSetIndex} 
+                workoutIntelligence={workoutIntelligence} 
+              />
+
               <View style={styles.spacer} />
-              
+
               <ActiveSetTracker
                 exercise={currentExercise}
                 currentSetIndex={currentSetIndex}
@@ -117,28 +151,38 @@ export default function ActiveWorkoutScreen() {
 
               <ActiveExerciseInstructions instructions={currentExercise.instructions} />
 
+              <View style={styles.spacer} />
+
+              {!isLastExercise && <ActiveNextExercisePreview exercise={exercises[currentExerciseIndex + 1]} />}
+
               <ActiveWorkoutTimeline exercises={exercises} currentIndex={currentExerciseIndex} />
+
+              <ActiveWorkoutIntelligence intelligence={workoutIntelligence} />
             </View>
           </Animated.View>
         )}
       </ScrollView>
 
-      <ActiveBottomControls
-        isResting={isResting}
-        isPaused={isPaused}
-        onPrev={prevExercise}
-        onNext={nextExercise}
-        onPauseToggle={togglePause}
-        onCompleteSet={handleCompleteSet}
-        onFinishWorkout={finishWorkout}
-        isLastExercise={isLastExercise}
-        isLastSet={isLastSet}
-      />
+      {/* Hidden during rest so RestScreen owns the controls and there is only one pause button. */}
+      {isRestVisible ? null : (
+        <ActiveBottomControls
+          isPaused={isPaused}
+          onPrev={prevExercise}
+          onNext={nextExercise}
+          onPauseToggle={togglePause}
+          onCompleteSet={handleCompleteSet}
+          onFinishWorkout={finishWorkout}
+          isLastExercise={isLastExercise}
+          isLastSet={isLastSet}
+        />
+      )}
     </View>
   );
 }
 
-function createStyles(theme: AegisTheme, insets: any) {
+function createStyles(theme: AegisTheme, insets: EdgeInsets) {
+  const safeBottom = Math.max(insets.bottom, MIN_BOTTOM_INSET);
+
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -148,7 +192,11 @@ function createStyles(theme: AegisTheme, insets: any) {
       flex: 1,
     },
     scrollContent: {
-      paddingBottom: Math.max(insets.bottom, 40) + 100, // Space for bottom controls
+      paddingBottom: safeBottom + BOTTOM_CONTROLS_CLEARANCE, // Space for bottom controls
+    },
+    restScrollContent: {
+      paddingTop: insets.top + theme.spacing.huge,
+      paddingBottom: safeBottom + theme.spacing.xl,
     },
     exerciseViewContainer: {
       width: '100%',

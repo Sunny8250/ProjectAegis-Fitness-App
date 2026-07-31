@@ -6,19 +6,23 @@ import type { AegisTheme } from '@/theme/themes';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { hexAlpha } from '@/utils/colors';
 import type { ActiveExercise } from '../../hooks/useActiveWorkout';
 
 interface ActiveExerciseShowcaseProps {
   exercise: ActiveExercise;
+  currentSetIndex?: number;
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const SHOWCASE_HEIGHT = SCREEN_WIDTH * 0.85; // Taller for immersive feel
+const SHOWCASE_HEIGHT = SCREEN_WIDTH * 0.85;
 
-export const ActiveExerciseShowcase = ({ exercise }: ActiveExerciseShowcaseProps) => {
+export const ActiveExerciseShowcase = ({ exercise, currentSetIndex = 0 }: ActiveExerciseShowcaseProps) => {
   const { theme } = useTheme();
   const styles = createStyles(theme);
+
+  const targetWeight = exercise.suggestedWeight || exercise.previousWeight || 0;
+  const targetReps = exercise.reps;
+  const currentSetDisplay = `Set ${currentSetIndex + 1} of ${exercise.sets.length}`;
 
   return (
     <View style={styles.container}>
@@ -34,6 +38,21 @@ export const ActiveExerciseShowcase = ({ exercise }: ActiveExerciseShowcaseProps
         locations={[0, 0.25, 0.55, 1]}
         style={styles.overlay}
       >
+        {/* Set Details Overlay */}
+        <View style={styles.setOverlayContainer}>
+          <View style={styles.setOverlayBox}>
+            <Text variant="caption" style={styles.setOverlayLabel}>{currentSetDisplay}</Text>
+          </View>
+          <View style={styles.setOverlayBox}>
+            <Text variant="caption" style={styles.setOverlayLabel}>{targetReps} Reps</Text>
+          </View>
+          {targetWeight > 0 && (
+            <View style={styles.setOverlayBox}>
+              <Text variant="caption" style={styles.setOverlayLabel}>{targetWeight} kg</Text>
+            </View>
+          )}
+        </View>
+
         <View style={styles.overlayContent}>
           <Text variant="display" style={styles.title}>{exercise.name}</Text>
           
@@ -89,6 +108,25 @@ function createStyles(theme: AegisTheme) {
       justifyContent: 'flex-end',
       padding: theme.spacing.lg,
     },
+    setOverlayContainer: {
+      flexDirection: 'row',
+      gap: 8,
+      marginBottom: theme.spacing.sm,
+    },
+    setOverlayBox: {
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: theme.radius.sm,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.15)',
+      backdropFilter: 'blur(8px)',
+    },
+    setOverlayLabel: {
+      color: '#FFFFFF',
+      fontWeight: '700',
+      letterSpacing: 0.5,
+    },
     overlayContent: {
       gap: theme.spacing.sm,
     },
@@ -128,6 +166,7 @@ function createStyles(theme: AegisTheme) {
       right: 0,
       justifyContent: 'center',
       alignItems: 'center',
+      pointerEvents: 'none',
     },
     playButton: {
       width: 48,

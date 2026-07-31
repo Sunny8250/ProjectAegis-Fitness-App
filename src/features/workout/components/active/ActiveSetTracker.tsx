@@ -79,6 +79,23 @@ export const ActiveSetTracker = ({ exercise, currentSetIndex, onUpdateSet }: Act
                   <Text variant="small" style={styles.activeSetLabel}>Current Set</Text>
                 </View>
 
+                {/* Historical Context */}
+                <View style={styles.historicalContextRow}>
+                  <View style={styles.historyBlock}>
+                    <Text variant="caption" style={styles.historyLabel}>PREVIOUS</Text>
+                    <Text variant="body" style={styles.historyValue}>
+                      {exercise.previousWeight ? `${exercise.previousWeight} kg` : '-'} × {exercise.previousReps || '-'}
+                    </Text>
+                  </View>
+                  <View style={styles.historyDivider} />
+                  <View style={styles.historyBlock}>
+                    <Text variant="caption" style={styles.historyLabel}>SUGGESTED</Text>
+                    <Text variant="body" style={[styles.historyValue, { color: theme.colors.primary }]}>
+                      {exercise.suggestedWeight ? `${exercise.suggestedWeight} kg` : '-'}
+                    </Text>
+                  </View>
+                </View>
+
                 {/* Weight and Reps Editors */}
                 <View style={styles.editorsRow}>
                   {/* Weight */}
@@ -230,6 +247,35 @@ function createStyles(theme: AegisTheme) {
       textTransform: 'uppercase',
       letterSpacing: 0.5,
       fontSize: 11,
+    },
+    historicalContextRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: hexAlpha(theme.colors.surface, 0.5),
+      borderRadius: theme.radius.md,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      justifyContent: 'space-between',
+    },
+    historyBlock: {
+      flex: 1,
+      alignItems: 'center',
+    },
+    historyDivider: {
+      width: 1,
+      height: 24,
+      backgroundColor: hexAlpha(theme.colors.text.secondary, 0.2),
+    },
+    historyLabel: {
+      color: theme.colors.text.secondary,
+      fontSize: 9,
+      letterSpacing: 1,
+      marginBottom: 2,
+    },
+    historyValue: {
+      fontWeight: '700',
+      fontSize: 13,
+      color: theme.colors.text.primary,
     },
     editorsRow: {
       flexDirection: 'row',

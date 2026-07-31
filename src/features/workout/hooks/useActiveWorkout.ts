@@ -6,6 +6,7 @@ export interface WorkoutSet {
   reps: string;
   weight: number;
   completed: boolean;
+  isPR?: boolean;
 }
 
 export interface ActiveExercise {
@@ -18,6 +19,9 @@ export interface ActiveExercise {
   instructions: string[];
   aiTip: string;
   targetMuscles: string[]; // Mocking target muscles for now
+  previousWeight?: number;
+  previousReps?: string;
+  suggestedWeight?: number;
 }
 
 export function useActiveWorkout(workoutId: string) {
@@ -30,8 +34,9 @@ export function useActiveWorkout(workoutId: string) {
     sets: Array.from({ length: ex.sets }).map((_, i) => ({
       id: `${ex.id}-set-${i}`,
       reps: ex.reps,
-      weight: 0, // Default weight, could be loaded from history
+      weight: ex.suggestedWeight || ex.previousWeight || 0, // Load suggested weight
       completed: false,
+      isPR: false,
     })),
   }));
 
@@ -46,8 +51,17 @@ export function useActiveWorkout(workoutId: string) {
   const [isFinished, setIsFinished] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
 
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const restTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Mock Workout Intelligence
+  const workoutIntelligence = {
+    recovery: 94,
+    readiness: 'High',
+    pace: 'Excellent',
+    recommendedRest: 60,
+    fatigue: 'Moderate'
+  };
+
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const restTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Global elapsed time
   useEffect(() => {
@@ -62,6 +76,11 @@ export function useActiveWorkout(workoutId: string) {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [isFinished, isPaused]);
+
+  const handleRestComplete = useCallback(() => {
+    setIsResting(false);
+    setRestTimeRemaining(0);
+  }, []);
 
   // Rest timer
   useEffect(() => {
@@ -81,12 +100,7 @@ export function useActiveWorkout(workoutId: string) {
     return () => {
       if (restTimerRef.current) clearInterval(restTimerRef.current);
     };
-  }, [isResting, isPaused, restTimeRemaining]);
-
-  const handleRestComplete = useCallback(() => {
-    setIsResting(false);
-    setRestTimeRemaining(0);
-  }, []);
+  }, [isResting, isPaused, restTimeRemaining, handleRestComplete]);
 
   const completeSet = useCallback((weight: number, reps: string) => {
     setExercises((prev) => {
@@ -94,9 +108,14 @@ export function useActiveWorkout(workoutId: string) {
       const ex = { ...newExercises[currentExerciseIndex] };
       const set = { ...ex.sets[currentSetIndex] };
       
+      
+      // Simple mock PR logic: if weight > previous weight and reps >= previous reps
+      const isPR = ex.previousWeight && weight > ex.previousWeight;
+      
       set.completed = true;
       set.weight = weight;
       set.reps = reps;
+      set.isPR = !!isPR;
       
       ex.sets[currentSetIndex] = set;
       newExercises[currentExerciseIndex] = ex;
@@ -176,13 +195,14 @@ export function useActiveWorkout(workoutId: string) {
     currentExerciseIndex,
     currentSetIndex,
     currentExercise: exercises[currentExerciseIndex],
-    currentSet: exercises[currentExerciseIndex].sets[currentSetIndex],
+    currentSet: exercises[currentExerciseIndex]?.sets[currentSetIndex],
     upcomingExercise: exercises[currentExerciseIndex + 1] || null,
     isResting,
     restTimeRemaining,
     elapsedTime,
     isFinished,
     isPaused,
+    workoutIntelligence,
     completeSet,
     updateSet,
     skipRest,

@@ -6,7 +6,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/theme/useTheme";
 import type { AegisTheme } from "@/theme/themes";
-import { hexAlpha } from "@/utils/colors";
 import { Text } from "@/components/common/Text";
 import { MOCK_WORKOUT_DETAIL } from "../data/mockWorkoutDetail";
 

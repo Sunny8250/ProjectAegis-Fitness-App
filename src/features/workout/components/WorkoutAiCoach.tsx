@@ -23,7 +23,7 @@ export const WorkoutAiCoach = ({ tip }: WorkoutAiCoachProps) => {
           <MaterialCommunityIcons name="robot" size={24} color={theme.colors.info} />
           <Text variant="title" style={styles.cardTitle}>Coach Tip</Text>
         </View>
-        <Text variant="body" style={styles.tipText}>"{tip}"</Text>
+        <Text variant="body" style={styles.tipText}>&quot;{tip}&quot;</Text>
       </View>
     </View>
   );
@@ -58,7 +58,7 @@ function createStyles(theme: AegisTheme) {
     tipText: {
       fontStyle: 'italic',
       lineHeight: 22,
-      color: theme.colors.text,
+      color: theme.colors.text.primary,
     },
   });
 }

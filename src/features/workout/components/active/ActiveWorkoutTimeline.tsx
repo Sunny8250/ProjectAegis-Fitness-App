@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Text } from '@/components/common/Text';
 import { useTheme } from '@/theme/useTheme';
 import type { AegisTheme } from '@/theme/themes';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { ActiveExercise } from '../../hooks/useActiveWorkout';
+import { hexAlpha } from '@/utils/colors';
 
 interface ActiveWorkoutTimelineProps {
   exercises: ActiveExercise[];
@@ -48,14 +49,21 @@ export const ActiveWorkoutTimeline = ({ exercises, currentIndex }: ActiveWorkout
               </View>
 
               <View style={[styles.content, isCompleted && styles.contentCompleted]}>
-                <Text variant="body" style={[
-                  styles.exerciseName,
-                  isCurrent && styles.exerciseNameCurrent
-                ]}>
-                  {exercise.name}
-                </Text>
+                <View style={styles.headerRow}>
+                  <Text variant="body" style={[
+                    styles.exerciseName,
+                    isCurrent && styles.exerciseNameCurrent
+                  ]}>
+                    {exercise.name}
+                  </Text>
+                  {isCurrent && (
+                    <View style={styles.activeBadge}>
+                      <Text variant="caption" style={styles.activeBadgeText}>ACTIVE</Text>
+                    </View>
+                  )}
+                </View>
                 <Text variant="caption" style={styles.exerciseDetails}>
-                  {exercise.sets.length} Sets • {exercise.sets[0]?.reps || 'Varies'} Reps
+                  {exercise.sets.length} Sets • {exercise.sets[0]?.reps || 'Varies'} Reps • {exercise.duration}
                 </Text>
               </View>
             </View>
@@ -138,7 +146,24 @@ function createStyles(theme: AegisTheme) {
     },
     exerciseDetails: {
       color: theme.colors.text.secondary,
-      marginTop: 2,
+      marginTop: 4,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    activeBadge: {
+      backgroundColor: hexAlpha(theme.colors.primary, 0.15),
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: theme.radius.sm,
+    },
+    activeBadgeText: {
+      color: theme.colors.primary,
+      fontWeight: '700',
+      fontSize: 9,
+      letterSpacing: 0.5,
     },
   });
 }

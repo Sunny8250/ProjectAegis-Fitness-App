@@ -20,7 +20,7 @@ export const WorkoutEquipment = ({ equipment }: WorkoutEquipmentProps) => {
       <View style={styles.chipRow}>
         {equipment.length === 0 ? (
           <View style={styles.chip}>
-            <MaterialCommunityIcons name="human" size={16} color={theme.colors.text} />
+            <MaterialCommunityIcons name="human" size={16} color={theme.colors.text.primary} />
             <Text variant="body" style={styles.chipText}>Bodyweight Only</Text>
           </View>
         ) : (

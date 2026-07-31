@@ -1,21 +1,41 @@
-import React from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, StyleSheet } from 'react-native';
 import { Text } from '@/components/common/Text';
 import { useTheme } from '@/theme/useTheme';
 import type { AegisTheme } from '@/theme/themes';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { hexAlpha } from '@/utils/colors';
 import { LinearGradient } from 'expo-linear-gradient';
+import type { ActiveExercise } from '../../hooks/useActiveWorkout';
 
 interface ActiveAiCoachProps {
-  tip: string;
+  exercise: ActiveExercise;
+  currentSetIndex: number;
+  workoutIntelligence?: {
+    recovery: number;
+    readiness: string;
+    pace: string;
+  };
 }
 
-export const ActiveAiCoach = ({ tip }: ActiveAiCoachProps) => {
+export const ActiveAiCoach = ({ exercise, currentSetIndex, workoutIntelligence }: ActiveAiCoachProps) => {
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
-  if (!tip) return null;
+  const contextualTip = useMemo(() => {
+    if (currentSetIndex > 0 && exercise.previousWeight && exercise.previousWeight < (exercise.suggestedWeight || 0)) {
+      return `You completed your previous set easily. Consider increasing the weight to ${exercise.suggestedWeight} kg.`;
+    }
+    if (workoutIntelligence?.pace === 'Excellent' && currentSetIndex > 1) {
+      return "Excellent pace. Keep your current tempo.";
+    }
+    if (workoutIntelligence?.recovery > 90) {
+      return "High readiness detected. You can push hard on this set.";
+    }
+    return exercise.aiTip || "Maintain a neutral spine throughout this movement.";
+  }, [exercise, currentSetIndex, workoutIntelligence]);
+
+  if (!contextualTip) return null;
 
   return (
     <View style={styles.outerContainer}>
@@ -38,7 +58,7 @@ export const ActiveAiCoach = ({ tip }: ActiveAiCoachProps) => {
           <Text variant="small" style={styles.title}>Aegis AI Coach</Text>
         </View>
 
-        <Text variant="body" style={styles.tipText}>{tip}</Text>
+        <Text variant="body" style={styles.tipText}>{contextualTip}</Text>
       </View>
     </View>
   );

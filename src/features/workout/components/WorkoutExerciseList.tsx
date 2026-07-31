@@ -209,7 +209,7 @@ function createStyles(theme: AegisTheme) {
     },
     bulletText: {
       flex: 1,
-      color: theme.colors.text,
+      color: theme.colors.text.primary,
       lineHeight: 22,
     },
     aiTipBlock: {

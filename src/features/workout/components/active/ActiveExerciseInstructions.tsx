@@ -18,12 +18,12 @@ export const ActiveExerciseInstructions = ({ instructions }: ActiveExerciseInstr
 
   return (
     <View style={styles.container}>
-      <Text variant="heading3" style={styles.title}>Instructions</Text>
+      <Text variant="heading3" style={styles.title}>Form & Technique</Text>
       <View style={styles.list}>
         {instructions.map((step, index) => (
-          <View key={index} style={styles.stepContainer}>
-            <View style={styles.stepNumberContainer}>
-              <Text variant="small" style={styles.stepNumber}>{index + 1}</Text>
+          <View key={index} style={styles.stepCard}>
+            <View style={styles.iconContainer}>
+              <MaterialCommunityIcons name="check-circle" size={20} color={theme.colors.success} />
             </View>
             <Text variant="body" style={styles.stepText}>{step}</Text>
           </View>
@@ -43,30 +43,26 @@ function createStyles(theme: AegisTheme) {
       marginBottom: theme.spacing.md,
     },
     list: {
-      gap: theme.spacing.md,
+      gap: theme.spacing.sm,
     },
-    stepContainer: {
+    stepCard: {
       flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: hexAlpha(theme.colors.surface, 0.4),
+      padding: theme.spacing.md,
+      borderRadius: theme.radius.md,
+      borderWidth: 1,
+      borderColor: hexAlpha(theme.colors.text.secondary, 0.1),
       gap: theme.spacing.md,
-      alignItems: 'flex-start',
     },
-    stepNumberContainer: {
-      width: 24,
-      height: 24,
-      borderRadius: 12,
-      backgroundColor: hexAlpha(theme.colors.text.secondary, 0.15),
+    iconContainer: {
       justifyContent: 'center',
       alignItems: 'center',
-      marginTop: 2,
-    },
-    stepNumber: {
-      color: theme.colors.text.secondary,
-      fontWeight: '700',
     },
     stepText: {
       flex: 1,
       color: theme.colors.text.primary,
-      lineHeight: 22,
+      lineHeight: 20,
     },
   });
 }
