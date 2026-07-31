@@ -32,7 +32,9 @@ export default function WorkoutDetailsScreen() {
   const handleBack = () => router.back();
   const handleBookmark = () => console.log("Bookmarked");
   const handleShare = () => console.log("Shared");
-  const handleStart = () => console.log("Start Workout");
+  const handleStart = () => {
+    router.push(`/workout/active/${id}`);
+  };
   const handlePreview = () => console.log("Preview Exercises");
 
   return (

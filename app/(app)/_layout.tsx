@@ -27,12 +27,19 @@ export default function AppLayout() {
           title: 'Profile',
         }}
       />
-      <Tabs.Screen
-        name="workout/[id]"
+      <Tabs.Screen 
+        name="workout/[id]" 
         options={{
           href: null,
-          tabBarStyle: { display: 'none' },
-        }}
+          tabBarStyle: { display: 'none' }
+        }} 
+      />
+      <Tabs.Screen 
+        name="workout/active/[id]" 
+        options={{
+          href: null,
+          tabBarStyle: { display: 'none' }
+        }} 
       />
     </Tabs>
   );
