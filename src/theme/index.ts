@@ -1,6 +1,7 @@
 import { colors } from "./colors";
 
 export * from "./colors";
+export * from "./responsive";
 export * from "./spacing";
 export * from "./typography";
 export * from "./radius";

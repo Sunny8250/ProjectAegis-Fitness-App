@@ -1,12 +1,26 @@
-import { Stack } from 'expo-router';
+import { Tabs } from 'expo-router';
+import { BottomTabBar } from '@/components/navigation/BottomTabBar';
 
-/** Groups authenticated app routes behind a stack until tabs are introduced later. */
 export default function AppLayout() {
   return (
-    <Stack
+    <Tabs
+      tabBar={(props) => <BottomTabBar {...props} />}
       screenOptions={{
         headerShown: false,
       }}
-    />
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Home',
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+        }}
+      />
+    </Tabs>
   );
 }

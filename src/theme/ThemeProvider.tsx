@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState, type PropsWithChildren } from 'react';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, useWindowDimensions } from 'react-native';
 
+import { createResponsiveMetrics } from './responsive';
 import { ThemeContext } from './ThemeContext';
-import { darkTheme, lightTheme, type ResolvedThemeMode, type ThemeMode } from './themes';
+import { createTheme, type ResolvedThemeMode, type ThemeMode } from './themes';
 
 type ThemeProviderProps = PropsWithChildren<{
   initialMode?: ThemeMode;
@@ -22,10 +23,18 @@ const resolveThemeMode = (
 /** Provides Project Aegis theme state, system detection, and theme switching actions. */
 export function ThemeProvider({ children, initialMode = 'system' }: ThemeProviderProps) {
   const systemScheme = useColorScheme();
+  const { height, width } = useWindowDimensions();
   const [mode, setMode] = useState<ThemeMode>(initialMode);
 
   const resolvedMode = resolveThemeMode(mode, systemScheme);
-  const theme = resolvedMode === 'dark' ? darkTheme : lightTheme;
+  const metrics = useMemo(
+    () => createResponsiveMetrics(width, height),
+    [height, width],
+  );
+  const theme = useMemo(
+    () => createTheme(resolvedMode, metrics),
+    [metrics, resolvedMode],
+  );
 
   const setTheme = useCallback((nextMode: ThemeMode) => {
     setMode(nextMode);

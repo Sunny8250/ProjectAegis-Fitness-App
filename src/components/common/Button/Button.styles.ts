@@ -1,9 +1,9 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
-import type { TextColorToken } from '@/components/common/Text';
-import type { AegisTheme } from '@/theme/themes';
+import type { TextColorToken } from "@/components/common/Text";
+import type { AegisTheme } from "@/theme/themes";
 
-import type { ButtonSize, ButtonVariant } from './Button.types';
+import type { ButtonSize, ButtonVariant } from "./Button.types";
 
 type ButtonState = {
   disabled: boolean;
@@ -11,32 +11,32 @@ type ButtonState = {
 };
 
 const sizeStyles = (theme: AegisTheme, size: ButtonSize) => {
-  const styles = {
+  const s = {
     small: {
-      minHeight: theme.spacing.xl,
+      minHeight: 36,
       paddingHorizontal: theme.spacing.md,
       paddingVertical: theme.spacing.xs,
       gap: theme.spacing.xs,
     },
     medium: {
-      minHeight: theme.spacing.xxl,
+      minHeight: 44,
       paddingHorizontal: theme.spacing.lg,
       paddingVertical: theme.spacing.sm,
       gap: theme.spacing.xs,
     },
     large: {
-      minHeight: theme.spacing.xxxl,
+      minHeight: 52,
       paddingHorizontal: theme.spacing.xl,
       paddingVertical: theme.spacing.md,
       gap: theme.spacing.sm,
     },
   };
 
-  return styles[size];
+  return s[size];
 };
 
 const variantStyles = (theme: AegisTheme, variant: ButtonVariant) => {
-  const styles = {
+  const s = {
     primary: {
       backgroundColor: theme.colors.primary,
       borderColor: theme.colors.primary,
@@ -49,6 +49,7 @@ const variantStyles = (theme: AegisTheme, variant: ButtonVariant) => {
     outline: {
       backgroundColor: theme.colors.transparent,
       borderColor: theme.colors.primary,
+      borderWidth: 1.5,
     },
     ghost: {
       backgroundColor: theme.colors.transparent,
@@ -61,42 +62,36 @@ const variantStyles = (theme: AegisTheme, variant: ButtonVariant) => {
     },
   };
 
-  return styles[variant];
+  return s[variant];
 };
 
 const textColors = {
-  primary: 'white',
-  secondary: 'primary',
-  outline: 'primary',
-  ghost: 'primary',
-  danger: 'white',
+  primary: "white",
+  secondary: "primary",
+  outline: "primary",
+  ghost: "primary",
+  danger: "white",
 } satisfies Record<ButtonVariant, TextColorToken>;
 
-/** Resolves the theme text color token for a button state. */
-export function getButtonTextColor(variant: ButtonVariant, disabled: boolean): TextColorToken {
-  return disabled ? 'disabled' : textColors[variant];
+export function getButtonTextColor(
+  variant: ButtonVariant,
+  disabled: boolean,
+): TextColorToken {
+  return disabled ? "disabled" : textColors[variant];
 }
 
-/** Resolves the concrete ActivityIndicator color for a button state. */
 export function getButtonIndicatorColor(
   theme: AegisTheme,
   variant: ButtonVariant,
   disabled: boolean,
-) {
+): string {
   const textColor = getButtonTextColor(variant, disabled);
 
-  if (textColor === 'white') {
-    return theme.colors.white;
-  }
-
-  if (textColor === 'disabled') {
-    return theme.colors.disabled;
-  }
-
+  if (textColor === "white") return theme.colors.white;
+  if (textColor === "disabled") return theme.colors.disabled;
   return theme.colors.primary;
 }
 
-/** Creates theme-aware styles for each button variant, size, and interaction state. */
 export function createButtonStyles(
   theme: AegisTheme,
   variant: ButtonVariant,
@@ -105,36 +100,41 @@ export function createButtonStyles(
 ) {
   return StyleSheet.create({
     root: {
-      minWidth: state.fullWidth ? '100%' : undefined,
-      alignSelf: state.fullWidth ? 'stretch' : 'flex-start',
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderWidth: 1,
+      minWidth: state.fullWidth ? "100%" : undefined,
+      alignSelf: state.fullWidth ? "stretch" : "flex-start",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: variant === "ghost" ? 0 : 1,
       borderRadius: theme.radius.button,
-      opacity: state.disabled ? 0.56 : 1,
+      opacity: state.disabled ? 0.5 : 1,
       ...sizeStyles(theme, size),
       ...variantStyles(theme, variant),
     },
     pressedRoot: {
-      opacity: state.disabled ? 0.56 : 0.82,
+      opacity: state.disabled ? 0.5 : 0.75,
+      transform: [{ scale: 0.97 }],
     },
     disabled: {
-      backgroundColor: variant === 'ghost' ? theme.colors.transparent : theme.colors.overlay,
-      borderColor: variant === 'ghost' ? theme.colors.transparent : theme.colors.border,
+      backgroundColor:
+        variant === "ghost"
+          ? theme.colors.transparent
+          : theme.colors.overlay,
+      borderColor:
+        variant === "ghost" ? theme.colors.transparent : theme.colors.border,
     },
     label: {
       flexShrink: 1,
     },
     icon: {
-      alignItems: 'center',
-      justifyContent: 'center',
+      alignItems: "center",
+      justifyContent: "center",
     },
     hiddenContent: {
       opacity: 0,
     },
     loadingIndicator: {
-      position: 'absolute',
+      position: "absolute",
     },
   });
 }

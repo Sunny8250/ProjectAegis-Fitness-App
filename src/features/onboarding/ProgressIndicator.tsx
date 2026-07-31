@@ -1,12 +1,12 @@
-import { memo, useEffect, useMemo } from 'react';
-import { Animated, Easing, StyleSheet, View } from 'react-native';
+import { memo, useEffect, useMemo } from "react";
+import { Animated, Easing, StyleSheet, View } from "react-native";
 
-import { useTheme } from '@/theme/useTheme';
+import { useTheme } from "@/theme/useTheme";
 
-const ACTIVE_DOT_WIDTH = 24;
-const INACTIVE_DOT_WIDTH = 8;
+const ACTIVE_DOT_WIDTH = 28;
+const INACTIVE_DOT_WIDTH = 6;
 const ACTIVE_DOT_OPACITY = 1;
-const INACTIVE_DOT_OPACITY = 0.4;
+const INACTIVE_DOT_OPACITY = 0.35;
 const DOT_ANIMATION_DURATION_MS = 300;
 
 type ProgressIndicatorProps = {
@@ -44,7 +44,7 @@ const ProgressDot = memo(function ProgressDot({ active }: ProgressDotProps) {
   return <Animated.View style={[styles.dot, { opacity, width }]} />;
 });
 
-/** Animated dot indicator for onboarding progress. */
+/** Animated dot indicator for onboarding progress with premium styling. */
 export const ProgressIndicator = memo(function ProgressIndicator({
   count,
   currentIndex,
@@ -61,15 +61,15 @@ export const ProgressIndicator = memo(function ProgressIndicator({
   );
 });
 
-const createStyles = (theme: ReturnType<typeof useTheme>['theme']) =>
+const createStyles = (theme: ReturnType<typeof useTheme>["theme"]) =>
   StyleSheet.create({
     container: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: theme.spacing.xs,
-      alignSelf: 'center',
-      paddingHorizontal: theme.spacing.sm,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: theme.spacing.sm,
+      alignSelf: "center",
+      paddingHorizontal: theme.spacing.md,
       paddingVertical: theme.spacing.xs,
       borderRadius: theme.radius.pill,
       backgroundColor: theme.colors.overlay,
