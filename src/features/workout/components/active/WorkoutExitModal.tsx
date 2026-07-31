@@ -32,7 +32,7 @@ export const WorkoutExitModal = ({ isVisible, onConfirm, onCancel }: WorkoutExit
               exiting={SlideOutDown.duration(200)} 
               style={styles.modalContent}
             >
-              <Text variant="h2" style={styles.title}>End this workout?</Text>
+              <Text variant="heading2" style={styles.title}>End this workout?</Text>
               
               <Text variant="body" color="secondary" style={styles.message}>
                 Your session is still in progress. You can keep training and finish it properly.

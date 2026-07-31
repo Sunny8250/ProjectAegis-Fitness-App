@@ -3,6 +3,7 @@ import { View, StyleSheet, Pressable, Animated, Easing, ScrollView } from "react
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 
 import { Card } from "@/components/common/Card";
 import { Text } from "@/components/common/Text";
@@ -61,8 +62,15 @@ export const TodaysWorkoutSection = memo(function TodaysWorkoutSection({ isLoadi
 
   const handlePressIn = () => Animated.spring(scaleAnim, { toValue: 0.98, useNativeDriver: true }).start();
   const handlePressOut = () => Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true }).start();
-  const handleStartWorkout = useCallback(() => {}, []);
-  const handleViewDetails = useCallback(() => {}, []);
+  const router = useRouter();
+
+  const handleStartWorkout = useCallback(() => {
+    router.push('/(app)/workout/active/1' as any);
+  }, [router]);
+  
+  const handleViewDetails = useCallback(() => {
+    router.push('/(app)/workout/1' as any);
+  }, [router]);
 
   if (isLoading) {
     return (

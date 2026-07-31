@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { View, StyleSheet, Animated, StatusBar, Platform } from "react-native";
+import { View, StyleSheet, Animated, StatusBar, Platform, BackHandler } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTheme } from "@/theme/useTheme";
 import type { AegisTheme } from "@/theme/themes";
@@ -24,12 +24,21 @@ export default function WorkoutDetailsScreen() {
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
+  React.useEffect(() => {
+    const onBackPress = () => {
+      router.replace('/explore');
+      return true;
+    };
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => subscription.remove();
+  }, [router]);
+
   const scrollOffsetY = useRef(new Animated.Value(0)).current;
 
   // In a real app, fetch workout by ID. Here we use mock data.
   const workout = MOCK_WORKOUT_DETAIL;
 
-  const handleBack = () => router.back();
+  const handleBack = () => router.replace('/explore');
   const handleBookmark = () => console.log("Bookmarked");
   const handleShare = () => console.log("Shared");
   const handleStart = () => {

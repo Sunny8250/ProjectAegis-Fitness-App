@@ -1,46 +1,62 @@
-import { Tabs } from 'expo-router';
+import { withLayoutContext } from 'expo-router';
+import { createMaterialTopTabNavigator } from 'expo-router/js-top-tabs';
 import { BottomTabBar } from '@/components/navigation/BottomTabBar';
+
+const { Navigator } = createMaterialTopTabNavigator();
+const SwipeTabs = withLayoutContext(Navigator);
 
 export default function AppLayout() {
   return (
-    <Tabs
-      tabBar={(props) => <BottomTabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-      }}
+    <SwipeTabs
+      tabBarPosition="bottom"
+      tabBar={(props: any) => <BottomTabBar {...props} />}
+      screenOptions={{}}
     >
-      <Tabs.Screen
+      <SwipeTabs.Screen
         name="index"
         options={{
           title: 'Home',
         }}
       />
-      <Tabs.Screen
+      <SwipeTabs.Screen
         name="explore"
         options={{
           title: 'Explore',
         }}
       />
-      <Tabs.Screen
+      <SwipeTabs.Screen
         name="profile"
         options={{
           title: 'Profile',
         }}
       />
-      <Tabs.Screen 
+      <SwipeTabs.Screen
+        name="analytics"
+        options={{
+          title: 'Analytics',
+        }}
+      />
+      <SwipeTabs.Screen 
         name="workout/[id]" 
         options={{
           href: null,
           tabBarStyle: { display: 'none' }
-        }} 
+        } as any} 
       />
-      <Tabs.Screen 
+      <SwipeTabs.Screen 
         name="workout/active/[id]" 
         options={{
           href: null,
           tabBarStyle: { display: 'none' }
-        }} 
+        } as any} 
       />
-    </Tabs>
+      <SwipeTabs.Screen 
+        name="workout/summary/[id]" 
+        options={{
+          href: null,
+          tabBarStyle: { display: 'none' }
+        } as any} 
+      />
+    </SwipeTabs>
   );
 }

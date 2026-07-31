@@ -34,6 +34,12 @@ export function BottomTabBar({ state, descriptors, navigation }: any) {
       <View style={styles.tabBar}>
         {state.routes.map((route: any, index: number) => {
           const { options } = descriptors[route.key];
+          
+          const VALID_TABS = ["index", "explore", "profile", "analytics"];
+          if (!VALID_TABS.includes(route.name) || options.href === null) {
+            return null;
+          }
+
           const label =
             options.tabBarLabel !== undefined
               ? options.tabBarLabel
@@ -84,13 +90,13 @@ export function BottomTabBar({ state, descriptors, navigation }: any) {
               testID={options.tabBarTestID}
               onPress={onPress}
               onLongPress={onLongPress}
-              style={styles.tabItem}
+              style={[styles.tabItem, isFocused && styles.tabItemFocused]}
             >
               <View style={[styles.iconWrap, isFocused && styles.iconWrapFocused]}>
                 <MaterialCommunityIcons name={iconName} size={24} color={color} />
               </View>
               {isFocused && (
-                <Text style={[styles.label, { color }]}>{label as string}</Text>
+                <Text numberOfLines={1} style={[styles.label, { color }]}>{label as string}</Text>
               )}
             </Pressable>
           );
@@ -132,8 +138,11 @@ function createStyles(theme: AegisTheme) {
       justifyContent: "center",
       gap: 6,
       paddingVertical: 8,
-      paddingHorizontal: 12,
+      paddingHorizontal: 8,
       borderRadius: theme.radius.full,
+    },
+    tabItemFocused: {
+      flex: 1.6,
     },
     iconWrap: {
       alignItems: "center",

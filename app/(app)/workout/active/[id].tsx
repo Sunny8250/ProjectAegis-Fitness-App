@@ -94,10 +94,9 @@ export default function ActiveWorkoutScreen() {
 
   useEffect(() => {
     if (isFinished) {
-      // Navigate to summary or go back
-      router.back();
+      router.replace({ pathname: '/(app)/workout/summary/[id]', params: { id } });
     }
-  }, [isFinished, router]);
+  }, [isFinished, router, id]);
 
   const handleCompleteSet = () => {
     completeSet(currentSet.weight, currentSet.reps);
