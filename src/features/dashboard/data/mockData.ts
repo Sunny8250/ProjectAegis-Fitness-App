@@ -114,6 +114,33 @@ export const featuredWorkouts = {
   },
 } as const;
 
+export const aiRecommendation = {
+  emoji: "🦾",
+  title: "Upper Body Strength",
+  rating: "4.9",
+  difficulty: "Intermediate",
+  duration: "45 min",
+  exercises: "12 Exercises",
+  calories: "320 kcal",
+  description: "Build strength in your chest, shoulders and triceps using progressive overload.",
+  imageUri: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1000&auto=format&fit=crop",
+  recommendationReasons: [
+    "Your chest hasn't been trained in 5 days",
+    "Recovery score is 94%",
+    "Readiness score is High",
+    "Completing this workout keeps you on track for your weekly goal"
+  ],
+  expectedBenefits: [
+    { icon: "fire", text: "Burn approximately 320 kcal" },
+    { icon: "arm-flex", text: "Improve upper body strength" },
+    { icon: "calendar-check", text: "Increase weekly consistency" },
+    { icon: "target", text: "Stay on track to reach your fitness goal" }
+  ],
+  targetMuscles: ["Chest", "Shoulders", "Triceps"],
+  equipment: ["Dumbbells", "Bench"],
+  intensity: "Intermediate"
+};
+
 export const healthMetrics = [
   {
     id: "heart-rate",
