@@ -81,7 +81,7 @@ export const MOCK_WORKOUT_DETAIL = {
       equipment: ["Dumbbells", "Bench"],
       difficulty: "Intermediate",
       category: "strength",
-      imageUri: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=500&auto=format&fit=crop",
+      imageUri: "https://media.tenor.com/fsVkPt8l-i4AAAAM/db-press.gif",
       instructions: [
         "Lie flat on the bench with dumbbells directly above your chest.",
         "Slowly lower the dumbbells until they are level with your chest.",
@@ -104,7 +104,7 @@ export const MOCK_WORKOUT_DETAIL = {
       equipment: ["Dumbbells", "Bench"],
       difficulty: "Intermediate",
       category: "strength",
-      imageUri: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=500&auto=format&fit=crop",
+      imageUri: "https://media.tenor.com/EKlO1-1CGSoAAAAM/kinobody.gif",
       instructions: [
         "Set the bench to a 30-45 degree incline.",
         "Press dumbbells upward, focusing on the upper chest."
@@ -126,7 +126,7 @@ export const MOCK_WORKOUT_DETAIL = {
       equipment: ["Dumbbells", "Bench"],
       difficulty: "Advanced",
       category: "strength",
-      imageUri: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=500&auto=format&fit=crop",
+      imageUri: "https://media.tenor.com/ae4epKVKBh8AAAAM/shoulderpress-dumbbells.gif",
       instructions: [
         "Sit with back support.",
         "Press dumbbells overhead until arms are fully extended."
@@ -145,7 +145,7 @@ export const MOCK_WORKOUT_DETAIL = {
       equipment: ["Dumbbells"],
       difficulty: "Beginner",
       category: "stability",
-      imageUri: "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?q=80&w=500&auto=format&fit=crop",
+      imageUri: "https://media.tenor.com/-OavRqpxSaEAAAAM/eleva%C3%A7%C3%A3o-lateral.gif",
       instructions: [
         "Stand tall, raise dumbbells out to your sides until parallel with the floor.",
         "Lower under control."
@@ -164,7 +164,7 @@ export const MOCK_WORKOUT_DETAIL = {
       equipment: ["Dumbbells"],
       difficulty: "Intermediate",
       category: "strength",
-      imageUri: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?q=80&w=500&auto=format&fit=crop",
+      imageUri: "https://media.tenor.com/Vq6LrVGUAKIAAAAM/tr%C3%ADceps-fraces-na-polia.gif",
       instructions: [
         "Hold a single heavy dumbbell overhead with both hands.",
         "Lower it behind your head by bending your elbows.",
@@ -184,7 +184,7 @@ export const MOCK_WORKOUT_DETAIL = {
       equipment: ["Resistance Bands"],
       difficulty: "Beginner",
       category: "conditioning",
-      imageUri: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=500&auto=format&fit=crop",
+      imageUri: "https://media.tenor.com/g9wNMqmfJ2sAAAAM/pushdown-lat-triceps.gif",
       instructions: [
         "Attach band to a high anchor.",
         "Keep elbows tucked, push hands down until arms are straight."

@@ -110,7 +110,6 @@ function createStyles(theme: AegisTheme) {
     },
     valueLabel: {
       color: theme.colors.text.primary,
-      fontVariant: ['tabular-nums'],
       fontWeight: '600',
     },
     track: {

@@ -33,7 +33,7 @@ export default function WorkoutDetailsScreen() {
   const handleBookmark = () => console.log("Bookmarked");
   const handleShare = () => console.log("Shared");
   const handleStart = () => {
-    router.push(`/workout/active/${id}`);
+    router.push(`/workout/active/${id}` as any);
   };
   const handlePreview = () => console.log("Preview Exercises");
 

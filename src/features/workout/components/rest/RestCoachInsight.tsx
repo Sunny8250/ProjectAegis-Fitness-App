@@ -30,12 +30,9 @@ const SKELETON_LINE_HEIGHTS = [16, 16] as const;
 interface RestCoachInsightProps {
   /** Current insight, or null while the first is still being chosen. */
   insight: CoachMessage | null;
-  /** The coach's recommendation for this rest window. */
-  adviceMessage: string;
 }
 
 function RestCoachInsightComponent({
-  adviceMessage,
   insight,
 }: RestCoachInsightProps) {
   const { theme } = useTheme();
@@ -57,12 +54,12 @@ function RestCoachInsightComponent({
         <View style={styles.badge}>
           <MaterialCommunityIcons
             color={theme.colors.primary}
-            name="creation"
+            name="robot-outline" // updated icon for consistency
             size={ICON_SIZE}
           />
         </View>
         <Text style={styles.eyebrow} variant="label">
-          Aegis AI Recovery Coach
+          Coach Guidance
         </Text>
       </View>
 
@@ -76,10 +73,10 @@ function RestCoachInsightComponent({
           <MaterialCommunityIcons
             color={theme.colors.primary}
             name={insight.icon}
-            size={ICON_SIZE}
+            size={ICON_SIZE + 4} // Slightly larger for emphasis
             style={styles.insightIcon}
           />
-          <Text style={styles.insightText} variant="body">
+          <Text style={styles.insightText} variant="heading3">
             {insight.text}
           </Text>
         </Animated.View>
@@ -87,7 +84,6 @@ function RestCoachInsightComponent({
         <View style={styles.skeletonGroup}>
           {SKELETON_LINE_HEIGHTS.map((height, index) => (
             <Skeleton
-              // Fixed-length placeholder list; index is the only stable key.
               key={index}
               borderRadius={theme.radius.xs}
               height={height}
@@ -97,16 +93,7 @@ function RestCoachInsightComponent({
         </View>
       )}
 
-      <View style={styles.adviceRow}>
-        <MaterialCommunityIcons
-          color={theme.colors.text.tertiary}
-          name="lightbulb-on-outline"
-          size={ICON_SIZE - 2}
-        />
-        <Text color="text.secondary" style={styles.adviceText} variant="caption">
-          {adviceMessage}
-        </Text>
-      </View>
+      {/* Advice Row removed here, because we handle active recommendations in RestRecommendationCard */}
     </View>
   );
 }

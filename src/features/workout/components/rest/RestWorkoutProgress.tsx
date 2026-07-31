@@ -27,7 +27,7 @@ interface RestWorkoutProgressProps {
 }
 
 interface StatTile {
-  icon: CoachIconName;
+  icon: any;
   label: string;
   value: string;
   tint: string;
@@ -173,7 +173,6 @@ function createStyles(theme: AegisTheme) {
     },
     statValue: {
       color: theme.colors.text.primary,
-      fontVariant: ['tabular-nums'],
       fontWeight: '700',
     },
   });

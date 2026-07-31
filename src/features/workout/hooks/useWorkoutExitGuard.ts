@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, BackHandler, Platform } from 'react-native';
 
 /**
@@ -30,48 +30,31 @@ export interface UseWorkoutExitGuardOptions {
 export interface WorkoutExitGuard {
   /** Opens the confirmation prompt. Safe to call from any exit affordance. */
   requestExit: () => void;
+  isPromptOpen: boolean;
+  confirmExit: () => void;
+  cancelExit: () => void;
 }
 
 export function useWorkoutExitGuard({
   enabled,
   onConfirmExit,
   onCancelExit,
-  title = DEFAULT_TITLE,
-  message = DEFAULT_MESSAGE,
 }: UseWorkoutExitGuardOptions): WorkoutExitGuard {
-  // Held in refs so the back handler never needs re-subscribing.
-  const onConfirmRef = useRef(onConfirmExit);
-  const onCancelRef = useRef(onCancelExit);
-  const isPromptOpenRef = useRef(false);
-
-  useEffect(() => {
-    onConfirmRef.current = onConfirmExit;
-    onCancelRef.current = onCancelExit;
-  }, [onCancelExit, onConfirmExit]);
+  const [isPromptOpen, setIsPromptOpen] = useState(false);
 
   const requestExit = useCallback(() => {
-    if (isPromptOpenRef.current) return;
-    isPromptOpenRef.current = true;
+    setIsPromptOpen(true);
+  }, []);
 
-    Alert.alert(title, message, [
-      {
-        text: CANCEL_LABEL,
-        style: 'cancel',
-        onPress: () => {
-          isPromptOpenRef.current = false;
-          onCancelRef.current?.();
-        },
-      },
-      {
-        text: CONFIRM_LABEL,
-        style: 'destructive',
-        onPress: () => {
-          isPromptOpenRef.current = false;
-          onConfirmRef.current();
-        },
-      },
-    ]);
-  }, [message, title]);
+  const confirmExit = useCallback(() => {
+    setIsPromptOpen(false);
+    onConfirmExit();
+  }, [onConfirmExit]);
+
+  const cancelExit = useCallback(() => {
+    setIsPromptOpen(false);
+    onCancelExit?.();
+  }, [onCancelExit]);
 
   useEffect(() => {
     if (!enabled || Platform.OS !== 'android') return;
@@ -79,13 +62,15 @@ export function useWorkoutExitGuard({
     const subscription = BackHandler.addEventListener(
       'hardwareBackPress',
       () => {
-        requestExit();
+        if (!isPromptOpen) {
+          requestExit();
+        }
         return true;
       },
     );
 
     return () => subscription.remove();
-  }, [enabled, requestExit]);
+  }, [enabled, requestExit, isPromptOpen]);
 
-  return { requestExit };
+  return { requestExit, isPromptOpen, confirmExit, cancelExit };
 }

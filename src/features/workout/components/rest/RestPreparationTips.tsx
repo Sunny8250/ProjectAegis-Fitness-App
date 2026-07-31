@@ -30,18 +30,16 @@ function RestPreparationTipsComponent({ cues }: RestPreparationTipsProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.eyebrow} variant="label">
-        Prepare for the next set
+        Preparation Checklist
       </Text>
 
       {cues.map((cue) => (
         <View key={cue} style={styles.cueRow}>
-          <View style={styles.bullet}>
-            <MaterialCommunityIcons
-              color={theme.colors.primary}
-              name="check"
-              size={ICON_SIZE - 4}
-            />
-          </View>
+          <MaterialCommunityIcons
+            color={theme.colors.primary}
+            name="checkbox-marked-circle-outline"
+            size={ICON_SIZE + 4}
+          />
           <Text style={styles.cueText} variant="caption">
             {cue}
           </Text>
@@ -66,17 +64,9 @@ function createStyles(theme: AegisTheme) {
       textTransform: 'uppercase',
     },
     cueRow: {
-      alignItems: 'flex-start',
+      alignItems: 'center',
       flexDirection: 'row',
       gap: theme.spacing.xs,
-    },
-    bullet: {
-      alignItems: 'center',
-      backgroundColor: hexAlpha(theme.colors.primary, 0.12),
-      borderRadius: theme.radius.full,
-      height: theme.metrics.scaleSize(20),
-      justifyContent: 'center',
-      width: theme.metrics.scaleSize(20),
     },
     cueText: {
       color: theme.colors.text.primary,

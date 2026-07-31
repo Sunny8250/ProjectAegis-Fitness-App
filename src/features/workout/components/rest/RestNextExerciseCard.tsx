@@ -30,7 +30,7 @@ interface RestNextExerciseCardProps {
 }
 
 interface MetaItem {
-  icon: CoachIconName;
+  icon: any;
   label: string;
   value: string;
 }
@@ -55,8 +55,10 @@ function RestNextExerciseCardComponent({ nextUp }: RestNextExerciseCardProps) {
         value: exercise.equipment.join(' · ') || 'Bodyweight',
       },
       { icon: 'clock-outline', label: 'Est. duration', value: exercise.duration },
+      { icon: 'fire', label: 'Est. calories', value: `${Math.round(exercise.targetMuscles.length * 15)} kcal` },
+      { icon: 'speedometer', label: 'Difficulty', value: exercise.equipment.length > 0 ? 'Intermediate' : 'Beginner' },
     ],
-    [exercise.duration, exercise.equipment, reps, setNumber, totalSets],
+    [exercise.duration, exercise.equipment, reps, setNumber, totalSets, exercise.targetMuscles],
   );
 
   return (
@@ -95,7 +97,7 @@ function RestNextExerciseCardComponent({ nextUp }: RestNextExerciseCardProps) {
 
         {exercise.targetMuscles.length > 0 ? (
           <View style={styles.muscleRow}>
-            {exercise.targetMuscles.map((muscle) => (
+            {exercise.targetMuscles.map((muscle: string) => (
               <View key={muscle} style={styles.muscleChip}>
                 <Text style={styles.muscleText} variant="small">
                   {muscle}

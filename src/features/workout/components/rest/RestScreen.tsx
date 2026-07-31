@@ -1,4 +1,4 @@
-import { memo, useMemo, type ReactNode } from 'react';
+import { memo, useMemo, useState, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
@@ -25,7 +25,8 @@ import { RestCountdownRing } from './RestCountdownRing';
 import { RestMotivation } from './RestMotivation';
 import { RestNextExerciseCard } from './RestNextExerciseCard';
 import { RestPreparationTips } from './RestPreparationTips';
-import { RestRecoveryStatus } from './RestRecoveryStatus';
+import { RestRecommendationCard } from './RestRecommendationCard';
+import { RestMetrics } from './RestMetrics';
 import { RestWorkoutProgress } from './RestWorkoutProgress';
 
 /**
@@ -96,26 +97,41 @@ function RestScreenComponent({
     timer.durationSeconds + REST_ADJUSTMENT_STEP_SECONDS <= MAX_REST_SECONDS &&
     !timer.isCompleting;
 
+  const [dismissedRecommendation, setDismissedRecommendation] = useState<string | null>(null);
+
+  const showRecommendation =
+    (recovery.advice === 'extend' || recovery.isSkipRecommended) &&
+    dismissedRecommendation !== recovery.advice;
+
   const primarySections = (
     <>
-      <Section index={0}>
+      {showRecommendation && (
+        <Section index={0}>
+          <RestRecommendationCard
+            currentRestSeconds={timer.durationSeconds}
+            suggestedRestSeconds={recovery.isSkipRecommended ? 0 : timer.durationSeconds + 15}
+            reason={recovery.adviceMessage}
+            onKeepCurrent={() => setDismissedRecommendation(recovery.advice)}
+            onApplySuggested={() => {
+              onAdjust(15);
+              setDismissedRecommendation(recovery.advice);
+            }}
+            onSkip={onSkip}
+          />
+        </Section>
+      )}
+
+      <Section index={showRecommendation ? 1 : 0}>
         <RestCoachInsight
-          adviceMessage={recovery.adviceMessage}
           insight={coach.insight}
         />
       </Section>
 
-      <Section index={1}>
-        <RestRecoveryStatus
-          energyPercent={recovery.energyPercent}
-          headline={recovery.headline}
-          readinessLabel={recovery.readinessLabel}
-          recoveryPercent={recovery.recoveryPercent}
-          zone={recovery.zone}
-        />
+      <Section index={showRecommendation ? 2 : 1}>
+        <RestMetrics progress={progress} recovery={recovery} />
       </Section>
 
-      <Section index={2}>
+      <Section index={showRecommendation ? 3 : 2}>
         <RestMotivation motivation={coach.motivation} />
       </Section>
     </>
@@ -157,6 +173,8 @@ function RestScreenComponent({
           isPaused={timer.isPaused}
           progress={timer.progress}
           remainingSeconds={timer.remainingSeconds}
+          recoveryPercent={recovery.recoveryPercent}
+          readinessLabel={recovery.readinessLabel}
         />
 
         <Text align="center" color="text.secondary" style={styles.rationale} variant="caption">

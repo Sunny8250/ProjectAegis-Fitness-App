@@ -308,8 +308,7 @@ function createStyles(theme: AegisTheme) {
       alignItems: 'center',
     },
     editorValue: {
-      fontWeight: '800',
-      fontVariant: ['tabular-nums'],
+      fontWeight: '600',
       color: theme.colors.text.primary,
       minWidth: 36,
       textAlign: 'center',

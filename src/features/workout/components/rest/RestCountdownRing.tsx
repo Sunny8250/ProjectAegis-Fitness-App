@@ -32,7 +32,7 @@ import {
  */
 
 /** Ring diameter per breakpoint tier, in baseline dp. */
-const RING_SIZE = { compact: 208, small: 224, tablet: 288, default: 248 };
+const RING_SIZE = { compact: 224, small: 240, tablet: 320, default: 280 };
 const RING_STROKE_WIDTH = 14;
 
 /** Matches the tick cadence so the arc never lags behind the digits. */
@@ -64,6 +64,10 @@ interface RestCountdownRingProps {
   isFinalCountdown: boolean;
   /** True while the completion animation plays. */
   isCompleting: boolean;
+  /** Physical recovery from the last set, 0–100. */
+  recoveryPercent: number;
+  /** Short readiness status, e.g. "Recovering". */
+  readinessLabel: string;
 }
 
 function RestCountdownRingComponent({
@@ -72,6 +76,8 @@ function RestCountdownRingComponent({
   isPaused,
   progress,
   remainingSeconds,
+  recoveryPercent,
+  readinessLabel,
 }: RestCountdownRingProps) {
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -195,6 +201,7 @@ function RestCountdownRingComponent({
                   {
                     color: accentColor,
                     fontSize: theme.metrics.scaleFont(COUNTDOWN_FONT_SIZE),
+                    lineHeight: theme.metrics.scaleFont(COUNTDOWN_FONT_SIZE * 1.1),
                   },
                 ]}
               >
@@ -205,6 +212,18 @@ function RestCountdownRingComponent({
             <Text style={styles.unit} variant="label">
               {unitLabel}
             </Text>
+
+            <View style={styles.recoveryContainer}>
+              <View style={styles.recoveryRow}>
+                <MaterialCommunityIcons name="heart" color={theme.colors.error} size={14} />
+                <Text color="text.secondary" variant="caption">Recovery</Text>
+                <Text style={styles.recoveryValue}>{recoveryPercent}%</Text>
+              </View>
+              <View style={styles.statusRow}>
+                <Text color="text.tertiary" variant="small">Status</Text>
+                <Text style={styles.statusValue}>{readinessLabel}</Text>
+              </View>
+            </View>
           </Animated.View>
 
           <Animated.View style={[styles.center, completionStyle]}>
@@ -214,7 +233,7 @@ function RestCountdownRingComponent({
               size={theme.metrics.scaleSize(COMPLETION_ICON_SIZE)}
             />
             <Text style={styles.completionLabel} variant="label">
-              Rest complete
+              READY!
             </Text>
           </Animated.View>
         </ProgressRing>
@@ -244,20 +263,47 @@ function createStyles(theme: AegisTheme) {
       top: 0,
     },
     countdown: {
-      fontVariant: ['tabular-nums'],
       fontWeight: '700',
-      includeFontPadding: false,
       textAlign: 'center',
+      marginTop: theme.spacing.lg, // Push down slightly to balance bottom content
     },
     unit: {
       color: theme.colors.text.secondary,
-      marginTop: theme.spacing.xxs,
+      marginTop: -2,
       textTransform: 'uppercase',
+    },
+    recoveryContainer: {
+      marginTop: theme.spacing.md,
+      alignItems: 'center',
+      gap: 2,
+    },
+    recoveryRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.xxs,
+    },
+    recoveryValue: {
+      color: theme.colors.primary,
+      fontWeight: '700',
+      fontSize: 13,
+    },
+    statusRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.xxs,
+    },
+    statusValue: {
+      color: theme.colors.text.primary,
+      fontWeight: '600',
+      fontSize: 13,
     },
     completionLabel: {
       color: theme.colors.success,
       marginTop: theme.spacing.xs,
       textTransform: 'uppercase',
+      fontWeight: '800',
+      fontSize: 24,
+      letterSpacing: 2,
     },
   });
 }

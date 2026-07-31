@@ -34,7 +34,7 @@ export const ActiveNextExercisePreview = ({ exercise }: ActiveNextExercisePrevie
           </Text>
           
           <Text variant="caption" style={styles.subtitle}>
-            {exercise.sets.length} Sets • {exercise.reps} Reps • {exercise.duration}
+            {exercise.sets.length} Sets • {exercise.sets[0]?.reps || 'N/A'} Reps • {exercise.duration}
           </Text>
 
           <View style={styles.tagsContainer}>

@@ -20,9 +20,9 @@ import type { CoachIconName } from '../../utils/restCoachEngine';
  */
 
 /** Minimum tappable dimension, per the accessibility guidelines. */
-const TOUCH_TARGET = 56;
-const ROUND_ICON_SIZE = 22;
-const SKIP_ICON_SIZE = 18;
+const TOUCH_TARGET = 64;
+const ROUND_ICON_SIZE = 24;
+const SKIP_ICON_SIZE = 20;
 const DISABLED_OPACITY = 0.4;
 
 interface RestControlsProps {

@@ -29,7 +29,7 @@ export const ActiveAiCoach = ({ exercise, currentSetIndex, workoutIntelligence }
     if (workoutIntelligence?.pace === 'Excellent' && currentSetIndex > 1) {
       return "Excellent pace. Keep your current tempo.";
     }
-    if (workoutIntelligence?.recovery > 90) {
+    if (workoutIntelligence && workoutIntelligence.recovery > 90) {
       return "High readiness detected. You can push hard on this set.";
     }
     return exercise.aiTip || "Maintain a neutral spine throughout this movement.";

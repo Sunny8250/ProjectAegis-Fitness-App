@@ -24,6 +24,25 @@ export interface ActiveExercise {
   suggestedWeight?: number;
 }
 
+export interface WorkoutSessionProgress {
+  progress: number;
+  exercisesCompleted: number;
+  exercisesRemaining: number;
+  elapsedSeconds: number;
+  caloriesBurned: number;
+  totalExercises: number;
+  setsCompleted: number;
+  totalSets: number;
+}
+
+export interface RestNextUp {
+  exercise: ActiveExercise;
+  isNewExercise: boolean;
+  reps: string;
+  setNumber: number;
+  totalSets: number;
+}
+
 export function useActiveWorkout(workoutId: string) {
   // In a real app, fetch workout by ID
   const workoutData = MOCK_WORKOUT_DETAIL;
@@ -34,7 +53,7 @@ export function useActiveWorkout(workoutId: string) {
     sets: Array.from({ length: ex.sets }).map((_, i) => ({
       id: `${ex.id}-set-${i}`,
       reps: ex.reps,
-      weight: ex.suggestedWeight || ex.previousWeight || 0, // Load suggested weight
+      weight: ex.suggestedWeight || ex.previousWeight || 0,
       completed: false,
       isPR: false,
     })),
@@ -50,6 +69,7 @@ export function useActiveWorkout(workoutId: string) {
   
   const [isFinished, setIsFinished] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
 
   // Mock Workout Intelligence
   const workoutIntelligence = {
@@ -63,9 +83,13 @@ export function useActiveWorkout(workoutId: string) {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const restTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Global elapsed time
+  const startWorkout = useCallback(() => {
+    setHasStarted(true);
+    setIsPaused(false);
+  }, []);
+
   useEffect(() => {
-    if (!isFinished && !isPaused) {
+    if (hasStarted && !isFinished && !isPaused && !isResting) {
       timerRef.current = setInterval(() => {
         setElapsedTime((prev) => prev + 1);
       }, 1000);
@@ -75,14 +99,13 @@ export function useActiveWorkout(workoutId: string) {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isFinished, isPaused]);
+  }, [hasStarted, isFinished, isPaused, isResting]);
 
   const handleRestComplete = useCallback(() => {
     setIsResting(false);
     setRestTimeRemaining(0);
   }, []);
 
-  // Rest timer
   useEffect(() => {
     if (isResting && !isPaused && restTimeRemaining > 0) {
       restTimerRef.current = setInterval(() => {
@@ -108,8 +131,6 @@ export function useActiveWorkout(workoutId: string) {
       const ex = { ...newExercises[currentExerciseIndex] };
       const set = { ...ex.sets[currentSetIndex] };
       
-      
-      // Simple mock PR logic: if weight > previous weight and reps >= previous reps
       const isPR = ex.previousWeight && weight > ex.previousWeight;
       
       set.completed = true;
@@ -124,18 +145,15 @@ export function useActiveWorkout(workoutId: string) {
 
     const currentEx = exercises[currentExerciseIndex];
     if (currentSetIndex < currentEx.sets.length - 1) {
-      // Move to next set, start rest
       setCurrentSetIndex((prev) => prev + 1);
       setIsResting(true);
-      setRestTimeRemaining(60); // 60s default rest
+      setRestTimeRemaining(60);
     } else if (currentExerciseIndex < exercises.length - 1) {
-      // Move to next exercise, start rest
       setCurrentExerciseIndex((prev) => prev + 1);
       setCurrentSetIndex(0);
       setIsResting(true);
-      setRestTimeRemaining(90); // 90s rest between exercises
+      setRestTimeRemaining(90);
     } else {
-      // Workout complete
       setIsFinished(true);
     }
   }, [currentExerciseIndex, currentSetIndex, exercises]);
@@ -189,6 +207,72 @@ export function useActiveWorkout(workoutId: string) {
     setIsPaused((prev) => !prev);
   }, []);
 
+  // MOCK properties needed by RestScreen and [id].tsx
+  const caloriesBurned = Math.round(elapsedTime * 0.15); // Mock calories
+
+  const restTimer = {
+    status: isResting ? 'running' : 'idle',
+    remainingSeconds: restTimeRemaining,
+    durationSeconds: currentSetIndex === 0 ? 90 : 60,
+    elapsedSeconds: (currentSetIndex === 0 ? 90 : 60) - restTimeRemaining,
+    progress: ((currentSetIndex === 0 ? 90 : 60) - restTimeRemaining) / (currentSetIndex === 0 ? 90 : 60),
+    isRunning: isResting,
+    isPaused: isPaused,
+    isCompleting: restTimeRemaining === 0 && isResting,
+    isFinalCountdown: restTimeRemaining <= 5 && restTimeRemaining > 0,
+    start: () => {},
+    pause: () => {},
+    resume: () => {},
+    adjust: () => {},
+    skip: () => {},
+    reset: () => {},
+  } as any;
+
+  const restPlan = {
+    transition: currentSetIndex === 0 ? 'between-exercises' : 'between-sets',
+    rationale: 'Recover your ATP stores before the next set.',
+    recommendedMinSeconds: 45,
+    recommendedMaxSeconds: 90,
+  } as any;
+
+  const restCoach = {
+    insight: { id: '1', icon: 'lightning-bolt', text: 'You are recovering well.' },
+    motivation: { id: '1', text: 'Keep it up!', author: 'Aegis' },
+    prepCues: ['Breathe deeply', 'Check your grip'],
+  } as any;
+
+  const recovery = {
+    recoveryPercent: 88,
+    energyPercent: 75,
+    zone: 'good',
+    readinessLabel: 'Ready soon',
+    headline: 'Recovery is on track.',
+    advice: 'hold',
+    adviceMessage: 'Maintain your current pace.',
+    isSkipRecommended: false,
+  } as any;
+
+  const nextUp: RestNextUp | null = exercises[currentExerciseIndex] ? {
+    exercise: exercises[currentExerciseIndex],
+    isNewExercise: currentSetIndex === 0,
+    reps: exercises[currentExerciseIndex].sets[currentSetIndex]?.reps || '10',
+    setNumber: currentSetIndex + 1,
+    totalSets: exercises[currentExerciseIndex].sets.length,
+  } : null;
+
+  const sessionProgress: WorkoutSessionProgress = {
+    progress: (currentExerciseIndex) / exercises.length,
+    exercisesCompleted: currentExerciseIndex,
+    exercisesRemaining: exercises.length - currentExerciseIndex,
+    elapsedSeconds: elapsedTime,
+    caloriesBurned,
+    totalExercises: exercises.length,
+    setsCompleted: currentExerciseIndex * 3 + currentSetIndex,
+    totalSets: exercises.length * 3,
+  };
+
+  const isPR = exercises[currentExerciseIndex]?.sets[currentSetIndex]?.isPR || false;
+
   return {
     workout: workoutData,
     exercises,
@@ -202,6 +286,7 @@ export function useActiveWorkout(workoutId: string) {
     elapsedTime,
     isFinished,
     isPaused,
+    hasStarted,
     workoutIntelligence,
     completeSet,
     updateSet,
@@ -211,5 +296,14 @@ export function useActiveWorkout(workoutId: string) {
     prevExercise,
     finishWorkout,
     togglePause,
+    startWorkout,
+    caloriesBurned,
+    restTimer,
+    restPlan,
+    restCoach,
+    recovery,
+    nextUp,
+    sessionProgress,
+    isPR,
   };
 }

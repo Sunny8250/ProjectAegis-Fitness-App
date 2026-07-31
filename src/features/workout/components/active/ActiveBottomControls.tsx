@@ -16,6 +16,8 @@ interface ActiveBottomControlsProps {
   onFinishWorkout: () => void;
   isLastExercise: boolean;
   isLastSet: boolean;
+  hasStarted?: boolean;
+  onStart?: () => void;
 }
 
 export const ActiveBottomControls = ({
@@ -27,6 +29,8 @@ export const ActiveBottomControls = ({
   onFinishWorkout,
   isLastExercise,
   isLastSet,
+  hasStarted = true,
+  onStart,
 }: ActiveBottomControlsProps) => {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
@@ -42,39 +46,61 @@ export const ActiveBottomControls = ({
         style={StyleSheet.absoluteFill} 
       />
       <View style={styles.content}>
-        <TouchableOpacity style={styles.iconButton} onPress={onPrev}>
-          <MaterialCommunityIcons name="chevron-left" size={28} color={theme.colors.text.primary} />
-        </TouchableOpacity>
+        {!hasStarted ? (
+          <View style={styles.mainActionContainer}>
+            <Button
+              variant="primary"
+              size="large"
+              onPress={onStart}
+              style={styles.mainButton}
+              leftIcon={
+                <MaterialCommunityIcons
+                  name="play-circle"
+                  size={24}
+                  color="#FFF"
+                />
+              }
+            >
+              Ready to Start
+            </Button>
+          </View>
+        ) : (
+          <>
+            <TouchableOpacity style={styles.iconButton} onPress={onPrev}>
+              <MaterialCommunityIcons name="chevron-left" size={28} color={theme.colors.text.primary} />
+            </TouchableOpacity>
 
-        <TouchableOpacity style={styles.iconButton} onPress={onPauseToggle}>
-          <MaterialCommunityIcons 
-            name={isPaused ? "play" : "pause"} 
-            size={28} 
-            color={isPaused ? theme.colors.primary : theme.colors.text.primary} 
-          />
-        </TouchableOpacity>
-
-        <View style={styles.mainActionContainer}>
-          <Button
-            variant="primary"
-            size="large"
-            onPress={isWorkoutEnd ? onFinishWorkout : onCompleteSet}
-            style={styles.mainButton}
-            leftIcon={
-              <MaterialCommunityIcons
-                name={isWorkoutEnd ? "check-all" : "check"}
-                size={24}
-                color="#FFF"
+            <TouchableOpacity style={styles.iconButton} onPress={onPauseToggle}>
+              <MaterialCommunityIcons 
+                name={isPaused ? "play" : "pause"} 
+                size={28} 
+                color={isPaused ? theme.colors.primary : theme.colors.text.primary} 
               />
-            }
-          >
-            {isWorkoutEnd ? "Finish Workout" : "Complete Set"}
-          </Button>
-        </View>
+            </TouchableOpacity>
 
-        <TouchableOpacity style={styles.iconButton} onPress={onNext}>
-          <MaterialCommunityIcons name="chevron-right" size={28} color={theme.colors.text.primary} />
-        </TouchableOpacity>
+            <View style={styles.mainActionContainer}>
+              <Button
+                variant="primary"
+                size="large"
+                onPress={isWorkoutEnd ? onFinishWorkout : onCompleteSet}
+                style={styles.mainButton}
+                leftIcon={
+                  <MaterialCommunityIcons
+                    name={isWorkoutEnd ? "check-all" : "check"}
+                    size={24}
+                    color="#FFF"
+                  />
+                }
+              >
+                {isWorkoutEnd ? "Finish Workout" : "Complete Set"}
+              </Button>
+            </View>
+
+            <TouchableOpacity style={styles.iconButton} onPress={onNext}>
+              <MaterialCommunityIcons name="chevron-right" size={28} color={theme.colors.text.primary} />
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </View>
   );
